@@ -5,7 +5,7 @@ import "../src/index.css";
 import Footer from "./Footer";
 import Header from "./Header";
 import Hero from "./Hero";
-import TaskBoard from "./TaskBoard/TaskBoard.jsx";
+import TaskBoard from "./TaskBoard/TaskBoard";
 import { useReducer  } from "react";
 import  { initialState , taskReducer } from "./TaskReducer/taskReducers";
 import { TaskContext } from "./contexts/TaskContexts.js";
