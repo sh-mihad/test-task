@@ -1,70 +1,89 @@
+import { useContext, useState } from "react";
+import { toast } from "react-toastify";
+import ModalTask from "./ModalTask";
 import TaskAction from "./TaskAction";
-
+import TaskList from "./TaskList";
+import { TaskContext } from "../contexts/taskContexts";
 export default function TaskBoard() {
+  const { state:taskList, dispatch } = useContext(TaskContext);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [taskToUpDate, setTaskToUpdate] = useState(null);
+  function handlTaskAddEdit(newtask, isadd) {
+    if (isadd) {
+      dispatch({ type: 'ADD_TASK', payload: newtask });
+    toast.success("Task added successfully!");
+    } else {
+      dispatch({ type: 'EDIT_TASK', payload: newtask });
+      toast.success("Task edited successfully!");
+    }
+    setIsModalOpen(false);
+    setTaskToUpdate(null);
+  }
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setTaskToUpdate(null);
+  };
+  function handleEDITtask(task) {
+    setTaskToUpdate(task);
+    setIsModalOpen(true);
+  }
+  function handleDeletTask(taskId) {
+    const confirmDeletion = window.confirm(
+      "Are you sure you want to delete this task?"
+    );
+    if (confirmDeletion) {
+      dispatch({ type: 'DELETE_TASK', payload: taskId });
+      toast.success("Task deleted successfully!");
+    }
+  }
+
+  function handleTaskFavourite(taskId) {
+    dispatch({ type: 'TOGGLE_FAVOURITE', payload: taskId });
+    toast.success("Task added favourte list !");
+  }
+  function handleDeletAllTask() {
+    const confirmDeletion = window.confirm(
+      "Are you sure you want to delete all tasks?"
+    );
+    if (confirmDeletion) {
+      dispatch({ type: 'DELETE_ALL_TASKS' });
+      toast.success("All tasks deleted successfully!");
+    }
+  }
+
+  function handleTaskSearch(searchTerm) {
+    if (searchTerm === "") {
+      dispatch({ type: 'RESET_TASKS' });
+    } else {
+      dispatch({ type: 'SEARCH_TASK', payload: searchTerm });
+    }
+  }
   return (
     <section className="mb-20" id="tasks">
-		
-		<div className="container">
-
-			<div className="rounded-xl border border-[rgba(206,206,206,0.12)] bg-[#1D212B] px-6 py-8 md:px-9 md:py-16">
-			<TaskAction />
-				<div className="overflow-auto">
-					<table className="table-fixed overflow-auto xl:w-full">
-						<thead>
-							<tr>
-								<th className="p-4 pb-8 text-sm font-semibold capitalize w-[48px]"></th>
-								<th className="p-4 pb-8 text-sm font-semibold capitalize w-[300px]"> Title </th>
-								<th className="p-4 pb-8 text-sm font-semibold capitalize w-full"> Description </th>
-								<th className="p-4 pb-8 text-sm font-semibold capitalize md:w-[350px]"> Tags </th>
-								<th className="p-4 pb-8 text-sm font-semibold capitalize md:w-[100px]"> Priority </th>
-								<th className="p-4 pb-8 text-sm font-semibold capitalize md:w-[100px]"> Options </th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr className="border-b border-[#2E3443] [&>td]:align-baseline [&>td]:px-4 [&>td]:py-2">
-								<td><svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-star" width="24"
-										height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="yellow" fill="yellow"
-										strokeLinecap="round" strokeLinejoin="round">
-										<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-										<path
-											d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
-									</svg></td>
-								<td>Integration API</td>
-								<td>
-									<div>
-										Connect an existing API to a third-party database using
-										secure methods and handle data exchange efficiently.
-									</div>
-								</td>
-								<td>
-									<ul className="flex justify-center gap-1.5 flex-wrap">
-										<li>
-											<span
-												className="inline-block h-5 whitespace-nowrap rounded-[45px] bg-[#00D991A1] px-2.5 text-sm capitalize text-[#F4F5F6]">Web</span>
-										</li>
-										<li>
-											<span
-												className="inline-block h-5 whitespace-nowrap rounded-[45px] bg-[#1C92FFB0] px-2.5 text-sm capitalize text-[#F4F5F6]">Python</span>
-										</li>
-										<li>
-											<span
-												className="inline-block h-5 whitespace-nowrap rounded-[45px] bg-[#FE1A1AB5] px-2.5 text-sm capitalize text-[#F4F5F6]">API</span>
-										</li>
-									</ul>
-								</td>
-								<td className="text-center">High</td>
-								<td>
-									<div className="flex items-center justify-center space-x-3">
-										<button className="text-red-500">Delete</button>
-										<button className="text-blue-500">Edit</button>
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</section>
-  )
+      <div className="container">
+        {isModalOpen && (
+          <ModalTask
+            taskToUPdate={taskToUpDate}
+            onADDEDIT={handlTaskAddEdit}
+            onTaskModalClose={handleModalClose}
+          />
+        )}
+        <div className="rounded-xl border border-[rgba(206,206,206,0.12)] bg-[#1D212B] px-6 py-8 md:px-9 md:py-16">
+          <TaskAction
+            onSearchTask={handleTaskSearch}
+            OndeleteAllTask={handleDeletAllTask}
+            onModalOpen={() => setIsModalOpen(true)}
+          />
+          <div className="overflow-auto">
+            <TaskList
+              onTaskFavourite={handleTaskFavourite}
+              onDeletTask={handleDeletTask}
+              onEditTask={handleEDITtask}
+              tasks={taskList}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }

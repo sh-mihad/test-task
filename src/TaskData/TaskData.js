@@ -1,4 +1,4 @@
-export const tasks = [
+export const taskState = [
     {
       id: crypto.randomUUID(),
       title: "Learn React js",
