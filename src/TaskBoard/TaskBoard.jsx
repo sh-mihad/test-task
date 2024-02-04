@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { TaskContext } from "../contexts/TaskContexts.js";
 import ModalTask from "./ModalTask";
 import TaskAction from "./TaskAction";
 import TaskList from "./TaskList";
-import { TaskContext } from "../contexts/TaskContexts.js";
 export default function TaskBoard() {
   const { state:taskList, dispatch } = useContext(TaskContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function TaskBoard() {
   }
   function handleDeletAllTask() {
     const confirmDeletion = window.confirm(
-      "Are you sure you want to delete all tasks?"
+      "Are you sure you want to delete all tasks boro vai?"
     );
     if (confirmDeletion) {
       dispatch({ type: 'DELETE_ALL_TASKS' });
